@@ -15,7 +15,8 @@ class AccessResource extends JsonResource
 	public function toArray(Request $request): array
 	{
 		return [
-			'name' => $this->email
+			'email' => $this->email,
+			'status' => $this->status
 		];
 	}
 }
