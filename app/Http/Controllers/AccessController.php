@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
-use App\Http\Resources\AccessResource;
+use App\Http\Resources\UserResource;
 use App\Models\Information;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class AccessController extends Controller
 			->where('password', $password)
 			->first();
 		if (!is_null($user)) {
-			return ApiResponse::success(new AccessResource($user));
+			return ApiResponse::success(new UserResource($user));
 		} else {
 			return ApiResponse::dataNotfound();
 		}
