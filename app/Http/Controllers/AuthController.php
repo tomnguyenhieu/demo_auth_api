@@ -8,7 +8,7 @@ use App\Models\Information;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class AccessController extends Controller
+class AuthController extends Controller
 {
 	public function login(Request $request)
 	{
