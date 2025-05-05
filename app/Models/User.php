@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-	use HasFactory;
+	use HasFactory, HasApiTokens;
 
 	protected $table = 'users';
 	protected $fillable = [
@@ -18,8 +19,8 @@ class User extends Authenticatable
 		'remember_token'
 	];
 
-	// protected $hidden = [
-	// 	'password',
-	// 	'remember_token'
-	// ];
+	public function files()
+	{
+		return $this->hasMany(File::class, 'user_id', 'id');
+	}
 }
