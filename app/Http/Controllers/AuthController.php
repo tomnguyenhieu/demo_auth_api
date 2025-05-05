@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Resources\UserResource;
 use App\Models\Information;
 use App\Models\User;
+use Hash;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -13,12 +14,10 @@ class AuthController extends Controller
 	public function login(Request $request)
 	{
 		$params = $request->all();
-		$email = $params['email'];
-		$password = $params['password'];
-		$user = User::where('email', $email)
-			->where('password', $password)
+		$user = User::where('email', $params['email'])
 			->first();
-		if (!is_null($user)) {
+
+		if (Hash::check($params['password'], $user->password)) {
 			return ApiResponse::success(new UserResource($user));
 		} else {
 			return ApiResponse::dataNotfound();
@@ -28,31 +27,11 @@ class AuthController extends Controller
 	public function register(Request $request)
 	{
 		$params = $request->all();
-		$email = $params['email'];
-		$password = $params['password'];
-		$check = 0;
-		foreach (User::get() as $user) {
-			if ($user->email == $email) {
-				return ApiResponse::internalServerError();
-			} else {
-				$check += 1;
-			}
-		}
-		if ($check > 0) {
-			User::insert([
-				'email' => $email,
-				'password' => $password,
-				'role' => 3,
-				'status' => 1,
-				'information_id' => Information::create(
-					[
-						'name' => 'Customer-' . count(Information::get()),
-					]
-				)->id,
-				'score' => 0,
-				'total_score' => 0
-			]);
-			return ApiResponse::success();
-		}
+		$user = User::create([
+			'name' => $params['name'],
+			'email' => $params['email'],
+			'password' => Hash::make($params['password']),
+		]);
+		return ApiResponse::success(new UserResource($user));
 	}
 }
