@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Resources\AuthResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -29,6 +30,8 @@ class AuthController extends Controller
 			'name' => $params['name'],
 			'email' => $params['email'],
 			'password' => Hash::make($params['password']),
+			'created_at' => Carbon::now(),
+			'updated_at' => Carbon::now()
 		]);
 		return ApiResponse::success();
 	}

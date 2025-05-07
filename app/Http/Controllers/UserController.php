@@ -14,8 +14,9 @@ class UserController extends Controller
 	 */
 	public function index()
 	{
+		$user = auth('sanctum')->user();
 		return ApiResponse::success(new UserResource(
-			auth('sanctum')->user()->with('files')->first()
+			$user->where('id', $user->id)->with('files')->first()
 		));
 	}
 
