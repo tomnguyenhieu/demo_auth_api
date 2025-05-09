@@ -28,27 +28,54 @@ class AuthController extends Controller
 	public function register(Request $request)
 	{
 		$params = $request->all();
-		User::insert([
-			'name' => $params['name'],
-			'email' => $params['email'],
-			'password' => Hash::make($params['password']),
-			'created_at' => Carbon::now(),
-			'updated_at' => Carbon::now()
-		]);
-		return ApiResponse::success();
+		try {
+			User::insert([
+				'name' => $params['name'],
+				'email' => $params['email'],
+				'password' => Hash::make($params['password']),
+				'created_at' => Carbon::now(),
+				'updated_at' => Carbon::now()
+			]);
+			return ApiResponse::success();
+		} catch (\Throwable $th) {
+			return ApiResponse::internalServerError();
+		}
 	}
 
 	public function logout(Request $request)
 	{
-		$request->user()->tokens()->delete();
-		return ApiResponse::success();
+		try {
+			$request->user()->tokens()->delete();
+			return ApiResponse::success();
+		} catch (\Throwable $th) {
+			return ApiResponse::internalServerError();
+		}
 	}
 
-	public function auth()
+	public function sendCode(Request $request)
 	{
+		$params = $request->all();
 		$code = rand(1000, 9999);
-		Mail::to(auth('sanctum')->user()->email)
-			->send(new SendAuthCode($code));
-		return ApiResponse::success($code);
+		if (auth('sanctum')->user()->email == $params['email']) {
+			Mail::to($params['email'])
+				->send(new SendAuthCode($code));
+			// TODO: fix storage code in somewhere...
+			// $request->session()->put('code', $code);
+			return ApiResponse::success([
+				'email' => $params['email'],
+				'code' => $code
+			]);
+		}
+		return ApiResponse::internalServerError();
+	}
+
+	public function auth(Request $request)
+	{
+		$params = $request->all();
+		$authCode = $request->session()->get('code');
+		if ($authCode == $params['code']) {
+			return ApiResponse::success();
+		}
+		return ApiResponse::internalServerError();
 	}
 }
