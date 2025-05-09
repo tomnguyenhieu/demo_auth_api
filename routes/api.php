@@ -25,6 +25,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
+	Route::get('/auth', [AuthController::class, 'auth']);
 	Route::get('/logout', [AuthController::class, 'logout']);
 
 	Route::group(['prefix' => 'user'], function () {

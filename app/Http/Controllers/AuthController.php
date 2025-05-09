@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Http\Resources\AuthResource;
+use App\Mail\SendAuthCode;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -40,5 +42,13 @@ class AuthController extends Controller
 	{
 		$request->user()->tokens()->delete();
 		return ApiResponse::success();
+	}
+
+	public function auth()
+	{
+		$code = rand(1000, 9999);
+		Mail::to(auth('sanctum')->user()->email)
+			->send(new SendAuthCode($code));
+		return ApiResponse::success($code);
 	}
 }
