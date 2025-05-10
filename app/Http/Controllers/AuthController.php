@@ -59,11 +59,9 @@ class AuthController extends Controller
 		if (auth('sanctum')->user()->email == $params['email']) {
 			Mail::to($params['email'])
 				->send(new SendAuthCode($code));
-			// TODO: fix storage code in somewhere...
-			// $request->session()->put('code', $code);
 			return ApiResponse::success([
 				'email' => $params['email'],
-				'code' => $code
+				'gen_code' => $code
 			]);
 		}
 		return ApiResponse::internalServerError();
@@ -72,10 +70,17 @@ class AuthController extends Controller
 	public function auth(Request $request)
 	{
 		$params = $request->all();
-		$authCode = $request->session()->get('code');
-		if ($authCode == $params['code']) {
-			return ApiResponse::success();
+		if ($params['gen_code'] == $params['auth_code']) {
+			try {
+				$user = User::find(auth('sanctum')->user()->id);
+				$user->email_verified_at = Carbon::now();
+				$user->updated_at = Carbon::now();
+				$user->save();
+				return ApiResponse::success();
+			} catch (\Throwable $th) {
+				return ApiResponse::internalServerError();
+			}
 		}
-		return ApiResponse::internalServerError();
+		return ApiResponse::unauthorized();
 	}
 }

@@ -30,4 +30,13 @@ class ApiResponse
 			'message' => 'Internal server error.'
 		]);
 	}
+
+	public static function unauthorized()
+	{
+		return response()->json([
+			'code' => 401,
+			'data' => null,
+			'message' => 'Unauthorized.'
+		]);
+	}
 }
